@@ -13,6 +13,7 @@ import {
   ProductPage,
   RegisterPage,
   ShopPage,
+  AiSearch,
 } from './pages';
 
 import { ProtectedProfileRoute, ProtectedRoute, Footer } from './components';
@@ -61,6 +62,7 @@ const App = () => {
       <Routes>
         <Route exact path='/' element={<HomePage />} />
         <Route path='/shop' element={<ShopPage />} />
+        <Route path='/AiSearch' element={<AiSearch />} />
         <Route path='/shop/:id' element={<ProductPage />} />
         <Route path='/cart' element={<CartPage />} />
         <Route path='*' element={<ErrorPage />} />

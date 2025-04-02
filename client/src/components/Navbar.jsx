@@ -29,13 +29,18 @@ const Navbar = () => {
       <Logo />
       <LinkContainer>
         <NavLink>
-          <Link className='link' to='/'>
+          <Link className="link" to="/">
             Home
           </Link>
         </NavLink>
         <NavLink>
-          <Link className='link' to='/shop'>
+          <Link className="link" to="/shop">
             Shop
+          </Link>
+        </NavLink>
+        <NavLink>
+          <Link className="link" to="/AiSearch">
+            AiSearch
           </Link>
         </NavLink>
       </LinkContainer>
@@ -48,10 +53,10 @@ const Navbar = () => {
           <UserMenu />
         ) : (
           <Icon>
-            <Link to='/login'>
+            <Link to="/login">
               <UserLinks>
                 <PersonOutlineOutlinedIcon
-                  style={{ color: 'black', fontSize: '26px' }}
+                  style={{ color: "black", fontSize: "26px" }}
                 />
                 Sign in
               </UserLinks>
@@ -60,15 +65,15 @@ const Navbar = () => {
         )}
         {userInfo && (
           <UserLinks>
-            <Link to='/cart' style={{ color: 'var(--clr-mocha-2)' }}>
+            <Link to="/cart" style={{ color: "var(--clr-mocha-2)" }}>
               <Badge
-                sx={{ color: 'var(--clr-mocha)' }}
-                color='primary'
-                style={{ paddingRight: '10px', marginTop: '3px' }}
+                sx={{ color: "var(--clr-mocha)" }}
+                color="primary"
+                style={{ paddingRight: "10px", marginTop: "3px" }}
                 badgeContent={data?.getUserCart.cartProducts.length || 0}
               >
                 <Icon>
-                  <ShoppingCartOutlinedIcon style={{ color: 'black' }} />
+                  <ShoppingCartOutlinedIcon style={{ color: "black" }} />
                 </Icon>
                 Cart
               </Badge>
@@ -79,7 +84,7 @@ const Navbar = () => {
       <MobileMenu>
         <MenuIcon
           onClick={() => dispatch(toggleMobileMenu())}
-          style={{ cursor: 'pointer', fontSize: '36px' }}
+          style={{ cursor: "pointer", fontSize: "36px" }}
         />
       </MobileMenu>
     </Wrapper>

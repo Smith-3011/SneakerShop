@@ -6,6 +6,7 @@ import OrderPage from './OrderPage';
 import ProductPage from './ProductPage';
 import RegisterPage from './RegisterPage';
 import ShopPage from './ShopPage';
+import AiSearch from './AiSearch';
 
 export {
   HomePage,
@@ -16,4 +17,5 @@ export {
   RegisterPage,
   ErrorPage,
   OrderPage,
+  AiSearch
 };

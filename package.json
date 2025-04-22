@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@graphql-tools/utils": "^8.6.1",
     "@reduxjs/toolkit": "^1.8.1",
     "apollo-server": "^3.8.2",
     "apollo-server-express": "^3.8.2",
@@ -24,8 +25,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "graphql": "^16.5.0",
-    "graphql-iso-date": "^3.6.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^3.1.2",
     "mongoose": "^6.3.6",
     "react-onclickoutside": "^6.12.2",

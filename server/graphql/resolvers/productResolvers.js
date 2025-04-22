@@ -64,37 +64,81 @@ export const products = {
 
       return products;
     },
-    getTopPicksProducts: async (_, {}, context) => {
-      const userAuth = await auth(context);
-      const userTopPicks = userAuth.topPicks;
+    getTopPicksProducts: async (_, args, context) => {
+      try {
+        const userAuth = await auth(context);
+        const userTopPicks = userAuth?.topPicks || ['Yeezy'];
 
-      const topPicksProducts = await Product.find({ brand: userTopPicks });
-      const defaultPicks = await Product.find({ brand: 'Yeezy' });
+        // Find products matching user's top picks
+        const topPicksProducts = await Product.find({ 
+          brand: { $in: Array.isArray(userTopPicks) ? userTopPicks : [userTopPicks] } 
+        });
+        
+        // Get default picks as fallback
+        const defaultPicks = await Product.find({ brand: 'Yeezy' });
 
-      let topPicks;
-      if (topPicksProducts.length < 4) {
-        topPicks = defaultPicks.slice(0, 4);
-      } else {
-        topPicks = new Set([]);
-        while (topPicks.size < 4) {
+        // If not enough products found for user's preferences, use default
+        if (!topPicksProducts || topPicksProducts.length < 4) {
+          const fallbackProducts = defaultPicks.length >= 4 ? defaultPicks.slice(0, 4) : [];
+          
+          // If still no products, get any products
+          if (fallbackProducts.length === 0) {
+            const anyProducts = await Product.find({}).limit(4);
+            return anyProducts.sort((a, b) => b.rates - a.rates);
+          }
+          
+          return fallbackProducts.sort((a, b) => b.rates - a.rates);
+        }
+        
+        // Otherwise use user's top picks
+        const topPicks = new Set();
+        const maxAttempts = topPicksProducts.length * 2; // Prevent infinite loop
+        let attempts = 0;
+        
+        while (topPicks.size < 4 && attempts < maxAttempts) {
           topPicks.add(
             topPicksProducts[
               Math.floor(Math.random() * topPicksProducts.length)
             ]
           );
+          attempts++;
         }
+        
+        // If set is still not full, add some default picks
+        if (topPicks.size < 4 && defaultPicks.length > 0) {
+          let i = 0;
+          while (topPicks.size < 4 && i < defaultPicks.length) {
+            topPicks.add(defaultPicks[i]);
+            i++;
+          }
+        }
+
+        return Array.from(topPicks).sort((a, b) => b.rates - a.rates);
+      } catch (error) {
+        console.error('Error in getTopPicksProducts:', error);
+        // Return default picks in case of error
+        const defaultProducts = await Product.find({ brand: 'Yeezy' }).limit(4);
+        return defaultProducts.length > 0 ? 
+          defaultProducts : 
+          await Product.find({}).limit(4);
       }
-
-      const sortedTopPicks = Array.from(topPicks).sort(
-        (a, b) => b.rates - a.rates
-      );
-
-      return sortedTopPicks;
     },
-    getDefaultTopPicks: async (_, {}) => {
-      const defaultPicks = await Product.find({ brand: 'Yeezy' });
-      const topPicks = defaultPicks.slice(0, 4);
-      return topPicks;
+    getDefaultTopPicks: async (_, args) => {
+      try {
+        const defaultPicks = await Product.find({ brand: 'Yeezy' });
+        
+        if (defaultPicks.length >= 4) {
+          return defaultPicks.slice(0, 4);
+        }
+        
+        // If not enough Yeezy products, get any products
+        const anyProducts = await Product.find({}).limit(4);
+        return anyProducts;
+      } catch (error) {
+        console.error('Error in getDefaultTopPicks:', error);
+        // In case of error, try to get any products
+        return await Product.find({}).limit(4);
+      }
     },
   },
   Mutation: {

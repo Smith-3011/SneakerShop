@@ -1,39 +1,63 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import StarIcon from '@mui/icons-material/Star';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { Link } from 'react-router-dom';
+import { getImageForProduct, getDefaultImage } from '../utils/imageUtils';
+import { mobile } from '../responsive';
+
 const ListView = ({ data, filteredProducts }) => {
+  // Use a state object to track image errors for each product by ID
+  const [imgErrors, setImgErrors] = useState({});
+  
+  // Handle image error for a specific product ID
+  const handleImageError = (productId) => {
+    setImgErrors(prev => ({
+      ...prev,
+      [productId]: true
+    }));
+  };
+  
   return (
     <Wrapper>
-      {filteredProducts &&
-        filteredProducts?.map((product) => {
-          const { title, image, price, rates, id } = product;
-          return (
-            <ProductContainer key={id}>
-              <Image src={image} />
-              <InfoContainer>
-                <Title>{title}</Title>
+      {filteredProducts?.map((product) => {
+        const { title, image, price, rates, id } = product;
+        
+        // Always prioritize the local assets over the server image
+        const productImage = title ? getImageForProduct(title) : getDefaultImage();
+        const imageSource = imgErrors[id] ? getDefaultImage() : productImage;
 
-                <Price>${price}</Price>
-                <RatesContainer>
-                  <StarIcon style={{ width: '8%' }} /> {rates}
-                  /5.0
-                </RatesContainer>
-              </InfoContainer>
-              <ButtonContainer>
-                <Link to={`/shop/${id}`}>
-                  <Button>
-                    Buy
-                    <AddShoppingCartIcon
-                      style={{ color: 'var(--clr-primary)', fontSize: '18px' }}
-                    />
-                  </Button>
-                </Link>
-              </ButtonContainer>
-            </ProductContainer>
-          );
-        })}
+        return (
+          <ProductContainer key={id}>
+            <ImageContainer>
+              <Image 
+                src={imageSource} 
+                alt={title || 'Sneaker image'}
+                onError={() => handleImageError(id)}
+              />
+            </ImageContainer>
+            <InfoContainer>
+              <Title>{title}</Title>
+
+              <Price>${price}</Price>
+              <RatesContainer>
+                <StarIcon style={{ width: '8%' }} /> {rates}
+                /5.0
+              </RatesContainer>
+            </InfoContainer>
+            <ButtonContainer>
+              <Link to={`/shop/${id}`}>
+                <Button>
+                  Buy
+                  <AddShoppingCartIcon
+                    style={{ color: 'var(--clr-primary)', fontSize: '18px' }}
+                  />
+                </Button>
+              </Link>
+            </ButtonContainer>
+          </ProductContainer>
+        );
+      })}
     </Wrapper>
   );
 };
@@ -53,9 +77,31 @@ const ProductContainer = styled.div`
   align-items: center;
   width: 100%;
 `;
-const Image = styled.img`
+
+const ImageContainer = styled.div`
   width: 25%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  margin: 10px;
+  overflow: hidden;
+  height: 200px;
 `;
+
+const Image = styled.img`
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
 const Title = styled.h3`
   text-decoration: underline;
 `;

@@ -2,6 +2,7 @@ import React from 'react';
 import ProductsContainer from './ProductsContainer';
 import styled from 'styled-components';
 import { mobile } from '../responsive';
+
 const GridView = ({ data }) => {
   return (
     <Wrapper>
@@ -16,6 +17,7 @@ const GridView = ({ data }) => {
 };
 
 export default GridView;
+
 const Wrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;

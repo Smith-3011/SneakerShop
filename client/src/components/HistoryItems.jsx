@@ -8,16 +8,22 @@ import { CREATE_REVIEW } from '../graphql/Mutations/productMutation';
 import Loading from '../assets/mui/Loading';
 import MuiError from '../assets/mui/Alert';
 import { mobile } from '../responsive';
+import { getImageForProduct, getDefaultImage } from '../utils/imageUtils';
 
 const HistoryItems = ({ productId, datePurchased, size }) => {
   const [historyItems, setHistoryItems] = useState([]);
   const [userRates, setUserRates] = useState(0);
   const [success, setSuccess] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
-      setSuccess(false);
-    }, 1500);
+    let timer;
+    if (success) {
+      timer = setTimeout(() => {
+        setSuccess(false);
+      }, 1500);
+    }
+    return () => clearTimeout(timer);
   }, [success]);
 
   const getUserRates = (value) => {
@@ -40,13 +46,21 @@ const HistoryItems = ({ productId, datePurchased, size }) => {
   });
 
   const { title, image, brand, rates, price } = historyItems;
+  
+  // Get appropriate image
+  const productImage = title ? getImageForProduct(title) : getDefaultImage();
+  const imageSource = imgError ? getDefaultImage() : image || productImage;
 
   return (
     <Wrapper>
       <Container>
         <ItemsContainer>
           <ImageContainer>
-            <Image src={image} />
+            <Image 
+              src={imageSource} 
+              alt={title || 'Sneaker image'}
+              onError={() => setImgError(true)}
+            />
           </ImageContainer>
           <InfoContainer>
             <Title>{title}</Title>
@@ -119,10 +133,31 @@ const ItemsContainer = styled.div`
   })}
 `;
 
-const ImageContainer = styled.div``;
+const ImageContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 12px;
+  margin: 10px;
+  overflow: hidden;
+  width: 200px;
+  height: 180px;
+`;
+
 const Image = styled.img`
-  height: 25vh;
-  ${mobile({ width: '200px', marginTop: '15px' })}
+  width: 100%;
+  height: 160px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+  
+  ${mobile({ width: '180px', height: '150px', marginTop: '15px' })}
 `;
 
 const InfoContainer = styled.div`

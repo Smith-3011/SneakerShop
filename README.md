@@ -1,3 +1,86 @@
+# Sneakers Shop with AI Search
+
+An e-commerce platform for sneaker enthusiasts featuring an AI-powered search system that provides detailed information about any sneaker model.
+
+## Features
+
+- **AI-Powered Sneaker Search**: Get comprehensive details about any sneaker model, including:
+  - History and background
+  - Launch information
+  - Current market prices across platforms (StockX, GOAT, etc.)
+  - Price history and trends
+  - Future price predictions
+  - Features and benefits
+  - Investment potential
+  - Buying recommendations
+
+- **Dynamic Product Catalog**: Browse through a collection of popular sneakers
+- **User Authentication**: Secure registration and login system
+- **Shopping Cart**: Add products to cart and manage quantities
+- **Responsive Design**: Optimized for all device sizes
+
+## Tech Stack
+
+- **Frontend**: React.js, Styled Components
+- **Backend**: Node.js, Express
+- **Database**: MongoDB
+- **Authentication**: JWT
+- **AI Integration**: Google Gemini API for sneaker information
+
+## Setup Instructions
+
+### Prerequisites
+- Node.js (v16 or higher)
+- MongoDB
+- Gemini API key from Google AI Studio
+
+### Installation
+
+1. Clone the repository:
+```
+git clone https://github.com/yourusername/sneakers-shop.git
+cd sneakers-shop
+```
+
+2. Install dependencies:
+```
+npm install
+cd client && npm install
+cd ../server && npm install
+```
+
+3. Create a `.env` file in the root directory with the following variables:
+```
+PORT = 5001
+MONGO_URL = mongodb://localhost:27017/SneakerShop
+JWT_SECRET = YOUR_JWT_SECRET
+GOOGLE_GEMINI_KEY = YOUR_GEMINI_API_KEY
+GOOGLE_CUSTOM_SEARCH_KEY = YOUR_CUSTOM_SEARCH_KEY
+GOOGLE_CUSTOM_SEARCH_CX = YOUR_CUSTOM_SEARCH_CX
+```
+
+4. Start the development server:
+```
+# Start the backend server
+npm run server
+
+# In a separate terminal, start the frontend
+cd client && npm start
+```
+
+5. Open your browser and navigate to `http://localhost:3000`
+
+## Available Scripts
+
+- `npm run server`: Start the backend server with nodemon
+- `npm run client`: Start the frontend client
+- `npm run build-client`: Build the frontend for production
+- `npm run render-postbuild`: Install and build client for deployment
+
+## License
+
+MIT
+
 # Sneakers Shop App
 > E-Commerce App built with the MERN stack.
 
@@ -20,8 +103,32 @@ Link: https://sneakers-shop.onrender.com/
 ## Admin
 ![screehnshot](https://github.com/amitshuu/sneakers-shop/blob/master/uploads/Admin.png)
 
+## Image Search API Integration
 
+The application now includes a free web image search integration for more accurate sneaker images. The system uses a hybrid approach:
 
+1. First tries to match with the local catalog of sneaker images
+2. If no local match is found, searches the web using Google Custom Search API (free)
+3. Falls back to a text-based placeholder if no images are found
+
+### Setup
+
+To enable the web image search:
+
+1. Create a free account at [Google Cloud Console](https://console.cloud.google.com/) 
+2. Set up a Custom Search Engine at [Programmable Search Engine](https://programmablesearchengine.google.com/about/)
+3. Get your API key and Search Engine ID (cx)
+4. Add your credentials to both `.env` files:
+   ```
+   GOOGLE_CUSTOM_SEARCH_KEY=your_api_key_here
+   GOOGLE_CUSTOM_SEARCH_CX=your_search_engine_id_here
+   ```
+
+### API Usage Limits
+
+- Google Custom Search JSON API: 100 requests/day (free tier)
+
+The application includes caching to minimize API calls for repeat searches.
 
 # Built with
 

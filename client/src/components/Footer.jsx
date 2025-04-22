@@ -7,7 +7,7 @@ const Footer = () => {
       <Container>
         <div>
           SneakersShop <br />
-          2022 &copy; All Rights Reserved.
+          2025 &copy; All Rights Reserved.
         </div>
       </Container>
     </Wrapper>

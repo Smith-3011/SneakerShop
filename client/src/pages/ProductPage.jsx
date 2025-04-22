@@ -11,19 +11,20 @@ import { ADD_TO_CART } from '../graphql/Mutations/cartMutations';
 import { useDispatch, useSelector } from 'react-redux';
 import { GET_USER_CART } from '../graphql/Queries/cartQueries';
 import { mobile } from '../responsive';
+import { getImageForProduct, getDefaultImage } from '../utils/imageUtils';
 
 const ProductPage = () => {
   const [product, setProduct] = useState('');
   const [shoeSize, setShoeSize] = useState([]);
   const [success, setSuccess] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const userInfo = useSelector((state) => state.user.userInfo);
 
   const { id } = useParams();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const userId = userInfo && userInfo.id;
+  const userId = userInfo?.id;
 
   const { loading, data, error } = useQuery(GET_SINGLE_PRODUCT, {
     variables: { productId: id },
@@ -45,7 +46,7 @@ const ProductPage = () => {
         userId,
         productId: id,
         size: shoeSize,
-        productPrice: data?.getProductById.price,
+        productPrice: data?.getProductById?.price,
       },
       refetchQueries: [
         {
@@ -58,135 +59,164 @@ const ProductPage = () => {
   );
 
   useEffect(() => {
-    if (data) {
-      setProduct(data?.getProductById);
+    if (data?.getProductById) {
+      setProduct(data.getProductById);
     }
-  }, [data, data?.getProductById, dispatch]);
+  }, [data]);
 
-  const { image, title, price, rates, inStock, brand, model, size } = product;
+  const handleImageError = () => {
+    setImgError(true);
+  };
 
-  const filteredCartProducts = cart?.getUserCart.cartProducts.filter(
-    (c) => c.productId === id
-  );
-  const filteredSizesFromCart = filteredCartProducts?.map((c) => +c.size);
-  const matchUserId = userId === cart?.getUserCart.userId;
-
-  const onClickHandler = () => {
-    if (!userId) {
-      navigate(`/login?redirect=${id}`);
+  const addShoeSize = (size) => {
+    if (shoeSize.includes(size)) {
+      setShoeSize(shoeSize.filter((sz) => sz !== size));
     } else {
-      cartHandle();
+      setShoeSize([...shoeSize, size]);
     }
   };
 
-  return (
-    <Wrapper className='section-center'>
-      <Navbar />
-      <Link to='/shop'>
-        <Button>BACK TO PRODUCTS</Button>
-      </Link>
-      {loading ? (
+  const addToCartHandler = () => {
+    if (!userInfo) {
+      alert('You must be logged in to add this item to your cart.');
+      navigate('/login');
+      return;
+    }
+
+    if (userInfo) {
+      if (shoeSize.length > 0) {
+        cartHandle();
+      } else {
+        alert('Please select a size');
+      }
+    }
+  };
+
+  const { title, price, rates, inStock, brand, model, size } = product;
+  
+  // Always prioritize getting the image based on the product title - just like in ProductsContainer
+  const productImage = title ? getImageForProduct(title) : getDefaultImage();
+  
+  // Determine which image source to use - prioritize our local images
+  const imageSource = imgError ? getDefaultImage() : productImage;
+  
+  // Debug logging
+  console.log(`ProductPage: Title=${title}, Using image: ${imageSource}`);
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
         <Loading />
-      ) : error ? (
-        <MuiError type='error' value={error.message} />
-      ) : (
-        <ProductContainer>
-          <ImageContainer>
-            <Image src={image} />
-          </ImageContainer>
-          <InfoContainer>
-            <Title>{title}</Title>
-            <Stars stars={rates} />
-            <Price>${price}</Price>
-            <Lorem>
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit. Numquam
-              ullam est dicta vero sint aliquid ut accusamus, natus corporis
-              quisquam obcaecati? Similique odio ex repellendus eaque, molestiae
-              praesentium sunt nesciunt.
-            </Lorem>
-            <Info>
-              Available:<span>{inStock ? 'In stock' : 'Out of stock'}</span>
-            </Info>
-            <Info>
-              Brand:<span>{brand}</span>
-            </Info>
-            <Info>
-              Model:<span>{model}</span>
-            </Info>
+      </>
+    );
+  }
 
-            {inStock ? (
-              <Info>
-                Sizes:
-                <SizeContainer>
-                  {size?.map((size, index) => (
-                    <SizeButton
-                      className={size === shoeSize ? 'active' : ''}
-                      onClick={(e) => setShoeSize(Number(e.target.value))}
-                      value={size}
-                      key={index}
-                      disabled={
-                        matchUserId &&
-                        filteredCartProducts &&
-                        filteredSizesFromCart?.includes(size)
-                      }
-                    >
-                      {`${size} US`}
-                    </SizeButton>
-                  ))}
-                </SizeContainer>
-              </Info>
-            ) : (
-              ''
-            )}
-            <hr />
-            <Button
-              className={`${inStock ? '' : 'btn-disabled'}`}
-              style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }}
-              disabled={cartLoading || !inStock}
-              onClick={onClickHandler}
-            >
-              {inStock ? 'ADD TO CART' : 'Out of stock'}
-            </Button>
+  if (error) {
+    return (
+      <>
+        <Navbar />
+        <MuiError
+          type='error'
+          value={'Error occured, Please refresh and try again!'}
+        />
+      </>
+    );
+  }
 
-            {cartLoading ? (
-              <Loading />
-            ) : cartError ? (
-              <MuiError type='error' width={'100%'} value={cartError.message} />
-            ) : success ? (
-              <MuiError type='success'>
-                Item added to the cart!
-                <Link
-                  style={{ textDecoration: 'underline', margin: '0.5rem' }}
-                  to='/cart'
-                >
-                  Visit cart
-                </Link>
-              </MuiError>
-            ) : (
-              ''
-            )}
-          </InfoContainer>
-        </ProductContainer>
-      )}
-    </Wrapper>
+  return (
+    <>
+      <Navbar />
+      <ProductContainer>
+        <ImageContainer>
+          <Image 
+            src={imageSource} 
+            alt={title || 'Sneaker image'}
+            onError={handleImageError}
+          />
+        </ImageContainer>
+        <InfoContainer>
+          <Title>{title}</Title>
+          <Stars stars={rates} />
+          <Info>
+            Model: <span>{model}</span>
+          </Info>
+          <Info>
+            Status: <span>{inStock ? 'In Stock' : 'Out Of Stock'}</span>
+          </Info>
+          <Info>
+            Brand: <span>{brand}</span>
+          </Info>
+
+          <Price>${price}</Price>
+          <Lorem>
+            Sneakers blend comfort, performance, and street-ready style, making them an essential for everyday wear. Crafted with precision and designed for impact, each pair offers a unique identity for modern sneakerheads.
+          </Lorem>
+
+          <SizeContainer>
+            {size?.map((shoe) => (
+              <SizeButton
+                key={`size-${shoe}`}
+                disabled={cartLoading}
+                onClick={() => addShoeSize(shoe)}
+                className={shoeSize.includes(shoe) ? 'active' : ''}
+              >
+                {shoe}
+              </SizeButton>
+            ))}
+          </SizeContainer>
+
+          {cartError && (
+            <MuiError
+              type='error'
+              value={'Something went wrong when adding this item to your cart.'}
+            />
+          )}
+          {success && !cartError && (
+            <MuiError
+              type='success'
+              value={'Added successfully to your cart!'}
+            />
+          )}
+          <Button
+            className={!inStock ? 'btn-disabled' : ''}
+            disabled={!inStock || cartLoading}
+            onClick={addToCartHandler}
+          >
+            Add To Cart
+          </Button>
+          <div>
+            <Link to='/'>Back to home page</Link>
+          </div>
+        </InfoContainer>
+      </ProductContainer>
+    </>
   );
 };
 
 export default ProductPage;
 
-const Wrapper = styled.div`
-  min-height: 105vh;
-`;
 const ProductContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  width: 100%;
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  gap: 2rem;
+  
   .btn-disabled {
     background-color: #666565;
     &:hover {
       background-color: #666565;
     }
   }
+  
+  ${mobile({ 
+    width: '95%', 
+    padding: '1rem 0.5rem',
+    gap: '1rem' 
+  })}
 `;
 
 const Button = styled.button`
@@ -207,18 +237,50 @@ const Button = styled.button`
 
 const ImageContainer = styled.div`
   flex: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 12px;
+  margin: 10px;
+  padding: 10px;
+  overflow: hidden;
+  height: 350px;
+  max-width: 450px;
+  
+  ${mobile({ height: '300px', maxWidth: '100%' })}
 `;
+
 const Image = styled.img`
-  width: 450px;
-  ${mobile({ width: '350px' })}
-  margin-top: 4rem;
+  width: auto;
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+  
+  ${mobile({ maxHeight: '260px' })}
 `;
+
 const InfoContainer = styled.div`
-  flex: 2;
+  flex: 3;
+  padding: 0 1rem;
+  
   .active {
     border: 1px solid black;
   }
+  
+  ${mobile({ 
+    flex: '1 1 100%',
+    padding: '0 0.5rem' 
+  })}
 `;
+
 const Title = styled.h1`
   color: var(--clr-primary);
   font-size: 36px;

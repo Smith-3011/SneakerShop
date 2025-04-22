@@ -1,4 +1,19 @@
+// Image utility for sneaker data
 import yeezy_700 from '../assets/items/adidas_yeezy_700_mauve.png';
+
+// Import local images for dummy data
+import yzCore from '../assets/images/Yeezy Slide Core.png';
+import yzBeluga from '../assets/images/Yeezy Boost 350 V2 Beluga.png';
+import yzBlackRed from '../assets/images/Yeezy Boost 350 V2 Black Red.png';
+import yzZebra from '../assets/images/Yeezy Boost 350 V2 Zebra.png';
+import yzInertia from '../assets/images/Yeezy Boost 700 V2 Inertia.png';
+import jordanTravisFragment from '../assets/images/Jordan 1 Low Fragment x Travis Scott.png';
+import jordanLowStar from '../assets/images/Jordan 1 Low Starfish.png';
+import jordanMid from '../assets/images/Jordan 1 Mid Chicago Black Toe.png';
+import jordanHighUnc from '../assets/images/Jordan 1 High UNC Chicago.png';
+import dunkPanda from '../assets/images/Nike Dunk Low Panda.png';
+import dunkOffWhite from '../assets/images/Nike Dunk Low Off-White Lot 45.png';
+import pumaRsxCore from '../assets/images/Puma RS-X Core.png';
 
 export const dummy_data = [
   {
@@ -7,7 +22,7 @@ export const dummy_data = [
     brand: 'Adidas Yeezy',
     model: 'V2 Beluga',
     price: 315,
-    image: 'https://i.ibb.co/nkWzsFy/adidas-yeezy-350-beluga.png',
+    image: yzBeluga,
     rates: 4.7,
     color: ['grey', 'orange'],
     inStock: true,
@@ -19,8 +34,7 @@ export const dummy_data = [
     brand: 'Nike Jordan Low',
     model: 'Fragment',
     price: 999,
-    image:
-      'https://i.postimg.cc/zXWNnV2k/nike-jordan-1-travis-fragment-low.png',
+    image: jordanTravisFragment,
     rates: 5.0,
     color: ['white', 'blue', 'black'],
     inStock: true,
@@ -32,7 +46,7 @@ export const dummy_data = [
     brand: 'Adidas Yeezy',
     model: '350 V2 Black Red',
     price: 416,
-    image: 'https://i.ibb.co/ggShV9Y/adidas-yeezy-350-bred.png',
+    image: yzBlackRed,
     rates: 4.9,
     color: ['black', 'red'],
     inStock: true,
@@ -44,7 +58,7 @@ export const dummy_data = [
     brand: 'Adidas Yeezy',
     model: '350 V2 Zebra',
     price: 275,
-    image: 'https://i.postimg.cc/nhZyBTDH/adidas-yeezy-350-zebra.png',
+    image: yzZebra,
     rates: 4.5,
     color: ['black', 'white'],
     inStock: true,
@@ -69,7 +83,7 @@ export const dummy_data = [
     brand: 'Adidas Yeezy',
     model: '700 V2 Inertia',
     price: 400,
-    image: 'https://i.ibb.co/t2w8nfM/adidas-yeezy-700-inertia.png',
+    image: yzInertia,
     rates: 4.3,
     color: ['blue', 'grey'],
     inStock: true,
@@ -81,10 +95,9 @@ export const dummy_data = [
     brand: 'Adidas Yeezy',
     model: 'Slides Core',
     price: 211,
-    image: 'https://i.ibb.co/9Wc6zVR/adidas-yeezy-slides-core.png',
+    image: yzCore,
     rates: 3.6,
     color: ['brown'],
-
     inStock: true,
     size: ['3', '3.5', '6', '6', '6', '8', '8.5'],
   },
@@ -94,7 +107,7 @@ export const dummy_data = [
     brand: 'Nike Dunk Low',
     model: 'Panda',
     price: 232,
-    image: 'https://i.ibb.co/7SBt6ty/nike-dunk-low-panda.png',
+    image: dunkPanda,
     rates: 4.2,
     color: ['black', 'white'],
     inStock: true,
@@ -106,7 +119,7 @@ export const dummy_data = [
     brand: 'Nike Jordan Low',
     model: 'Starfish',
     price: 278,
-    image: 'https://i.postimg.cc/zBL68c9k/nike-joran-1-low-starfish.png',
+    image: jordanLowStar,
     rates: 3.3,
     color: ['white', 'orange'],
     inStock: true,
@@ -118,7 +131,7 @@ export const dummy_data = [
     brand: 'Nike Jordan Mid',
     model: 'Chicago Black Toe',
     price: 135,
-    image: 'https://i.ibb.co/kqM3rC7/nike-jordan-1-mid-chicago-black-toe.png',
+    image: jordanMid,
     rates: 2.9,
     color: ['black', 'red', 'white'],
     inStock: true,
@@ -130,7 +143,7 @@ export const dummy_data = [
     brand: 'Jordan 1 High',
     model: 'Fearless UNC Chicago',
     price: 414,
-    image: 'https://i.ibb.co/PQfWdQV/nike-jordan-1-unc-to-chicago.png',
+    image: jordanHighUnc,
     rates: 5.0,
     color: ['black', 'blue', 'red'],
     inStock: true,
@@ -142,7 +155,7 @@ export const dummy_data = [
     brand: 'Nike Dunk Low',
     model: 'Off-White Lot 45',
     price: 710,
-    image: 'https://i.ibb.co/DPF3btT/nike-off-white-dunk-low-lot-45.png',
+    image: dunkOffWhite,
     rates: 5.0,
     color: ['pink', 'grey', 'white'],
     inStock: true,
@@ -154,7 +167,7 @@ export const dummy_data = [
     brand: 'Puma RS-X',
     model: 'Sci-Fi White',
     price: 112,
-    image: 'https://i.ibb.co/zGhXbWF/puma-rs-x-core.png',
+    image: pumaRsxCore,
     rates: 2.1,
     color: ['black', 'white'],
     inStock: true,
@@ -169,7 +182,7 @@ export const dummy_cart = [
     model: 'Beige Tone / Core Black / Cloud White',
     size: '10(US Men)',
     price: 360,
-    image: yeezy_700,
+    image: yzInertia,
     qty: 2,
   },
   {
@@ -178,7 +191,7 @@ export const dummy_cart = [
     model: 'Retro White Black Panda',
     size: '10.5(US Men)',
     price: 119,
-    image: 'https://i.ibb.co/7SBt6ty/nike-dunk-low-panda.png',
+    image: dunkPanda,
     qty: 1,
   },
   {
@@ -187,7 +200,7 @@ export const dummy_cart = [
     model: 'Core',
     size: '8(US Men)',
     price: 279,
-    image: 'https://i.ibb.co/9Wc6zVR/adidas-yeezy-slides-core.png',
+    image: yzCore,
     qty: 1,
   },
 ];

@@ -10,9 +10,28 @@ import { DELETE_FROM_CART } from '../graphql/Mutations/cartMutations';
 import { GET_USER_CART } from '../graphql/Queries/cartQueries';
 import MuiError from '../assets/mui/Alert';
 import { mobile } from '../responsive';
+import { getImageForProduct, getDefaultImage } from '../utils/imageUtils';
+
+// Fallback image URLs mapped by shoe type/brand
+const fallbackImages = {
+  'Yeezy Slide Core': 'https://i.ibb.co/9Wc6zVR/adidas-yeezy-slides-core.png',
+  'Nike Dunk Low Panda': 'https://i.ibb.co/7SBt6ty/nike-dunk-low-panda.png',
+  'Jordan 1 Mid Chicago Black Toe': 'https://i.ibb.co/kqM3rC7/nike-jordan-1-mid-chicago-black-toe.png',
+  'Jordan 1 High UNC Chicago': 'https://i.ibb.co/PQfWdQV/nike-jordan-1-unc-to-chicago.png',
+  'Puma RS-X Core': 'https://i.ibb.co/zGhXbWF/puma-rs-x-core.png',
+  // Generic fallbacks by brand
+  'Yeezy': 'https://i.ibb.co/1mdcmDW/adidas-yeezy-700-wave-runner.png',
+  'Jordan': 'https://i.ibb.co/2W5gXNT/nike-jordan-1-travis-mocha-high.png',
+  'Dunk': 'https://i.ibb.co/SKVRntS/nike-dunk-low-unc.png',
+  'Nike': 'https://i.ibb.co/VxB80fj/nike-dunk-low-chicago.png',
+  'Puma': 'https://i.ibb.co/hK4V4mH/puma-rs-dreamer-purple.png',
+  // Default fallback for any other type
+  'default': 'https://i.ibb.co/kJH3HD8/nike-jordan-4-university-blue.png'
+};
 
 const CartItems = ({ productId, size, id, orderPage, historyPage }) => {
   const [cartItems, setCartItems] = useState([]);
+  const [imgError, setImgError] = useState(false);
   const { userInfo } = useSelector((state) => state.user);
 
   const { loading } = useQuery(GET_SINGLE_PRODUCT, {
@@ -34,7 +53,22 @@ const CartItems = ({ productId, size, id, orderPage, historyPage }) => {
       ],
     });
 
-  const { image, title, model, price } = cartItems;
+  const { image, title, model, price, brand } = cartItems;
+  
+  // Get appropriate image
+  const productImage = title ? getImageForProduct(title) : getDefaultImage();
+  const imageSource = imgError ? getDefaultImage() : image || productImage;
+
+  // Function to get fallback image based on title or brand
+  const getFallbackImage = () => {
+    if (fallbackImages[title]) {
+      return fallbackImages[title];
+    }
+    if (fallbackImages[brand]) {
+      return fallbackImages[brand];
+    }
+    return fallbackImages.default;
+  };
 
   return (
     <>
@@ -52,7 +86,11 @@ const CartItems = ({ productId, size, id, orderPage, historyPage }) => {
           ) : (
             <ItemContainer>
               <ImageContainer>
-                <Image src={image} />
+                <Image 
+                  src={imageSource} 
+                  onError={() => setImgError(true)}
+                  alt={title || 'Sneaker image'}
+                />
               </ImageContainer>
               <InfoContainer>
                 <Title>{title} </Title>
@@ -128,10 +166,30 @@ const ItemContainer = styled.div`
   min-width: 290px;
   justify-content: space-evenly;
 `;
-const ImageContainer = styled.div``;
+const ImageContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  margin: 10px;
+  overflow: hidden;
+  width: 200px;
+  height: 180px;
+`;
 const Image = styled.img`
-  width: 180px;
-  ${mobile({ width: '120px', marginTop: '1rem' })}
+  width: 100%;
+  height: 160px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  transition: transform 0.3s ease;
+  ${mobile({ width: '120px', height: '120px', marginTop: '1rem' })}
+  
+  &:hover {
+    transform: scale(1.05);
+  }
 `;
 const InfoContainer = styled.div`
   width: ${(props) => (props.historyPage ? '60%' : '40%')};

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import icon from '../assets/utils/yeezy.svg';
 import { Link } from 'react-router-dom';
@@ -14,17 +14,68 @@ import { useSelector } from 'react-redux';
 import MuiError from '../assets/mui/Alert';
 import { mobile } from '../responsive';
 
+// Fallback products to display when server connection fails
+const fallbackProducts = [
+  {
+    id: "fallback1",
+    title: "Nike Air Jordan 1 High Chicago",
+    image: "/images/nike-jordan1.jpg",
+    price: 170,
+    rates: 4.8,
+    brand: "Nike"
+  },
+  {
+    id: "fallback2",
+    title: "Adidas Yeezy Boost 350 V2 Zebra",
+    image: "/images/yeezy-zebra.jpg",
+    price: 220,
+    rates: 4.7,
+    brand: "Adidas"
+  },
+  {
+    id: "fallback3",
+    title: "Nike Dunk Low Panda",
+    image: "/images/nike-dunk-panda.jpg",
+    price: 110,
+    rates: 4.5,
+    brand: "Nike"
+  }
+];
+
 const TopPicks = (props) => {
   const { userInfo } = useSelector((state) => state.user);
   const { cartPage } = props;
+  const [useFallback, setUseFallback] = useState(false);
 
   const query = userInfo ? GET_USER_TOP_PICKS : GET_DEFAULT_TOP_PICKS;
 
-  const { data, error, loading } = useQuery(query);
+  const { data, error, loading } = useQuery(query, {
+    fetchPolicy: 'network-only',
+    onError: (err) => {
+      console.error('TopPicks query error:', err);
+      setUseFallback(true);
+    }
+  });
 
-  const mapValue = userInfo
-    ? data?.getTopPicksProducts
-    : data?.getDefaultTopPicks;
+  // Only update the useEffect that determines when to use fallback data
+  useEffect(() => {
+    // Only use fallback if we have a definite error, not just when data is temporarily null
+    if (error && error.networkError) {
+      console.log("Network error detected, using fallback data for TopPicks");
+      setUseFallback(true);
+    } else if (!loading && data) {
+      // We have some data, make sure we're not using fallback
+      setUseFallback(false);
+    }
+  }, [error, loading, data]);
+
+  const mapValue = useFallback 
+    ? fallbackProducts
+    : (userInfo
+      ? data?.getTopPicksProducts
+      : data?.getDefaultTopPicks);
+
+  const hasValidData = mapValue && Array.isArray(mapValue) && mapValue.length > 0;
 
   return (
     <Wrapper>
@@ -39,13 +90,25 @@ const TopPicks = (props) => {
           </ViewButton>
         </Link>
       </HeaderContainer>
-      {loading ? (
+      {loading && !useFallback ? (
         <Loading />
-      ) : error ? (
-        <MuiError type='error' value={'Something went wrong..'} />
+      ) : error && !useFallback ? (
+        <MuiError 
+          width='40%' 
+          type='warning' 
+          alignItems='center' 
+          value={'Something went wrong.. Please try again later.'} 
+        />
+      ) : !hasValidData && !useFallback ? (
+        <MuiError
+          width='40%'
+          type='info'
+          alignItems='center'
+          value={'No product recommendations available at the moment.'}
+        />
       ) : (
         <ItemsContainer cartPage={cartPage && cartPage}>
-          {mapValue?.map((item) => (
+          {mapValue.map((item) => (
             <ProductsContainer key={item.id} {...item} />
           ))}
         </ItemsContainer>
